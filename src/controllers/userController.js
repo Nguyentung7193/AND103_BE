@@ -43,3 +43,28 @@ exports.login = async (req, res) => {
         res.status(500).json({ message: err.message });
     }
 };
+exports.updateUser = async (req, res) => {
+    try {
+        const userId = req.params.id;
+        const updates = req.body;
+        const updatedUser = await User.findByIdAndUpdate(userId, updates, { new: true });
+        if (!updatedUser) {
+            return res.status(404).json({
+                code: 404,
+                msg: "Không tìm thấy người dùng",
+                data: null,
+            });
+        }
+        return res.json({
+            code: 200,
+            msg: "Cập nhật thông tin người dùng thành công",
+            data: updatedUser,
+        });
+    } catch (error) {
+        return res.status(500).json({
+            code: 500,
+            msg: error.message,
+            data: null,
+        });
+    }
+};
