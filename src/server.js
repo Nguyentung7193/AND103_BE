@@ -4,6 +4,7 @@ const cors = require("cors");
 const mongoose = require("mongoose");
 const userRoutes = require("./routes/userRoutes");
 const authRoutes = require("./routes/authRoutes");
+const productRoutes = require("./routes/productRoutes");
 
 dotenv.config();
 
@@ -18,6 +19,8 @@ app.get("/", (req, res) => {
 app.use("/api/users", userRoutes);
 // Sử dụng auth routes
 app.use("/api/auth", authRoutes);
+// api cho product
+app.use("/api/products", productRoutes);
 
 // Kết nối MongoDB
 mongoose
