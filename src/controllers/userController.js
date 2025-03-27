@@ -38,6 +38,7 @@ exports.login = async (req, res) => {
         // Tạo JWT token (JWT_SECRET được định nghĩa trong .env)
         const payload = { userId: user._id };
         const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "1h" });
+        
         res.json({ token });
     } catch (err) {
         res.status(500).json({ message: err.message });
