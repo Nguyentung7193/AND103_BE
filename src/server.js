@@ -7,6 +7,7 @@ const authRoutes = require("./routes/authRoutes");
 const productRoutes = require("./routes/productRoutes");
 const authenticateToken = require("./middleware/authenticateToken");
 const orderRoutes = require("./routes/orderRoutes");
+const cartRoutes = require('./routes/cartRoutes');
 
 dotenv.config();
 
@@ -25,6 +26,8 @@ app.use("/api/auth", authRoutes);
 app.use("/api/products",authenticateToken, productRoutes);
 // api cho order
 app.use("/api/orders", orderRoutes);
+// api cho cart
+app.use("/api/cart",authenticateToken, cartRoutes);
 
 // Kết nối MongoDB
 mongoose
