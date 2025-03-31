@@ -46,7 +46,6 @@ exports.getProductById = async (req, res) => {
   };
   exports.searchProductsByName = async (req, res) => {
     try {
-      // Lấy query name từ URL: ví dụ: /api/products/search?name=TV
       const { name } = req.query;
   
       if (!name) {
@@ -56,8 +55,6 @@ exports.getProductById = async (req, res) => {
           data: null,
         });
       }
-  
-      // Sử dụng biểu thức chính quy để tìm kiếm không phân biệt chữ hoa chữ thường
       const regex = new RegExp(name, "i");
       const products = await Product.find({ name: regex });
   
