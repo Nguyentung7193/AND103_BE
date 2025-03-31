@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
+const mongoose = require('mongoose');
 const cartController = require('../controllers/cartController');
+const orderController = require('../controllers/orderController');
 // Giả sử bạn đã có middleware xác thực token
 const authenticateToken = require('../middleware/authenticateToken');
 
@@ -18,5 +20,6 @@ router.delete('/remove/:productId', authenticateToken, cartController.removeCart
 
 // Xóa toàn bộ giỏ hàng
 router.delete('/clear', authenticateToken, cartController.clearCart);
+
 
 module.exports = router;

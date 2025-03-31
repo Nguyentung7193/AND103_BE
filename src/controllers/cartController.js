@@ -10,11 +10,24 @@ exports.getCart = async (req, res) => {
     if (!cart) {
       cart = new Cart({ userID: userId, items: [] });
       await cart.save();
+      return res.status(200).json({
+        code: 200,
+        msg: "Giỏ hàng trống, đã tạo mới.",
+        data: cart
+      });
     }
     
-    res.status(200).json(cart);
+    return res.status(200).json({
+      code: 200,
+      msg: "Lấy giỏ hàng thành công.",
+      data: cart
+    });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    return res.status(500).json({
+      code: 500,
+      msg: "Lỗi máy chủ, không thể lấy giỏ hàng.",
+      data: null
+    });
   }
 };
 
