@@ -45,7 +45,7 @@ exports.login = async (req, res) => {
 };
 exports.updateUser = async (req, res) => {
     try {
-        const userId = req.params.id;
+        const userId = req.user.userId;
         const updates = req.body;
         const updatedUser = await User.findByIdAndUpdate(userId, updates, { new: true });
         if (!updatedUser) {
@@ -76,7 +76,11 @@ exports.getInforUser = async (req, res) => {
       if (!user) {
         return res.status(404).json({ message: 'User not found' });
       }
-      res.json(user);
+      res.status(200).json({ 
+        code: 200,
+        msg: 'Lấy thông tin người dùng thành công',
+        data: user
+       });
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
