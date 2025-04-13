@@ -16,7 +16,6 @@ exports.getCart = async (req, res) => {
         data: cart
       });
     }
-    
     return res.status(200).json({
       code: 200,
       msg: "Lấy giỏ hàng thành công.",

@@ -31,6 +31,17 @@ const OrderSchema = new mongoose.Schema({
         enum: ['online', 'offline'],
         required: true
     },
+    items: [
+        {
+          product: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Product'
+          },
+          name: String, // lưu để tránh bị thay đổi sau này
+          price: Number,
+          quantity: Number
+        }
+      ]
 }, { timestamps: true });
 
 module.exports = mongoose.model('orders', OrderSchema);

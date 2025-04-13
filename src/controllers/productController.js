@@ -3,7 +3,13 @@ const Product = require("../models/Products");
 exports.getProductsByType = async (req, res) => {
   try {
     const productType = req.params.type;
-    const products = await Product.find({ type: productType });
+    let query = {};
+    // Nếu productType khác "all" thì filter theo type, ngược lại lấy tất cả sản phẩm
+    if (productType && productType !== 'all') {
+      query = { type: productType };
+    }
+
+    const products = await Product.find(query);
 
     return res.json({
       code: 200,
