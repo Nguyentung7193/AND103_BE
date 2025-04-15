@@ -1,6 +1,46 @@
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const admin = require("../firebase/firebase-admin");
+
+
+exports.loginWithFirebase = async (req, res) => {
+    const { idToken } = req.body;
+    try {
+      // Xác minh idToken từ Firebase
+      const decodedToken = await admin.auth().verifyIdToken(idToken);
+      const { email, name, uid } = decodedToken;
+  
+      // Kiểm tra xem user đã tồn tại trong MongoDB chưa
+      let user = await User.findOne({ email });
+      if (!user) {
+        // Nếu chưa có thì tạo user mới (bạn có thể lưu uid nếu muốn)
+        user = new User({
+          name: name || "Chưa đặt tên",
+          email,
+          password: "", // vì login bằng Google nên password có thể để trống
+        });
+        await user.save();
+      }
+  
+      // Tạo JWT token riêng cho hệ thống của bạn
+      const payload = { userId: user._id };
+      const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "1h" });
+  
+      res.json({
+        message: "Đăng nhập bằng Firebase thành công",
+        token,
+        user: {
+          _id: user._id,
+          name: user.name,
+          email: user.email,
+        },
+      });
+    } catch (error) {
+      console.error("Lỗi xác minh Firebase token:", error);
+      res.status(401).json({ message: "Token Firebase không hợp lệ hoặc đã hết hạn." });
+    }
+  };
 
 exports.register = async (req, res) => {
     try {
