@@ -18,15 +18,12 @@ exports.loginWithFirebase = async (req, res) => {
         user = new User({
           name: name || "Chưa đặt tên",
           email,
-          password: "", // vì login bằng Google nên password có thể để trống
+          password: "",
         });
         await user.save();
       }
-  
-      // Tạo JWT token riêng cho hệ thống của bạn
       const payload = { userId: user._id };
       const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "1h" });
-  
       res.json({
         message: "Đăng nhập bằng Firebase thành công",
         token,
@@ -111,7 +108,6 @@ exports.updateUser = async (req, res) => {
 exports.getInforUser = async (req, res) => {
     try {
         const userId = req.user.userId;
-      // Tìm người dùng theo id được lấy từ token (đã được middleware verifyToken gán vào req.user)
       const user = await User.findById(userId).select('-password'); // loại bỏ trường password
       if (!user) {
         return res.status(404).json({ message: 'User not found' });

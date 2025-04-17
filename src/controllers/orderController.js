@@ -100,24 +100,20 @@ exports.createOrderFromCart = async (req, res) => {
         const userID = req.user.userId;
         const { fullname, address, phone, note, type,fcmToken} = req.body;
 
-        // 1. Lấy giỏ hàng của người dùng
         const cart = await Cart.findOne({ userID }).populate('items.product');
         if (!cart || cart.items.length === 0) {
             return res.status(400).json({ message: 'Giỏ hàng trống!' });
         }
 
-        // 2. Tính tổng giá tiền
         let totalPrice = 0;
-        const items = []; // Danh sách các sản phẩm trong đơn hàng
+        const items = [];
         for (const item of cart.items) {
             totalPrice += item.product.price * item.quantity;
             items.push({
-                product: item.product._id,  // ID của sản phẩm
+                product: item.product._id,
                 quantity: item.quantity
             });
         }
-
-        // 3. Tạo đơn hàng mới với các thông tin từ giỏ hàng
         const newOrder = new Order({
             userID,
             fullname,
@@ -126,13 +122,10 @@ exports.createOrderFromCart = async (req, res) => {
             totalPrice,
             note,
             type,
-            items  // Thêm các sản phẩm vào đơn hàng
+            items
         });
 
-        // 4. Lưu đơn hàng
         const savedOrder = await newOrder.save();
-
-        // 5. (Tuỳ chọn) Xoá giỏ hàng sau khi đặt hàng thành công
         await Cart.findOneAndDelete({ userID });
         if (fcmToken) {
             const title = "Đặt hàng thành công!";
@@ -142,7 +135,6 @@ exports.createOrderFromCart = async (req, res) => {
             console.warn("Không nhận được fcmToken từ client");
         }
 
-        // Trả về thông tin đơn hàng
         res.status(201).json({
             message: 'Đặt hàng thành công!',
             order: savedOrder
