@@ -2,26 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const Order = require('../models/Order');
 const Cart = require('../models/Cart');
-const admin = require("../firebase/firebase-admin");
 
-
-
-const sendNotificationToUser = async (fcmToken, title, body) => {
-    const message = {
-      notification: {
-        title,
-        body,
-      },
-      token: fcmToken,
-    };
-  
-    try {
-      const response = await admin.messaging().send(message);
-      console.log("Thông báo gửi thành công:", response);
-    } catch (error) {
-      console.error("Lỗi gửi thông báo:", error);
-    }
-  };
 
 // Lấy tất cả đơn hàng
 exports.getAllOrders = async (req, res) => {
@@ -48,57 +29,12 @@ exports.getOrderById = async (req, res) => {
     }
 };
 
-// exports.createOrderFromCart = async (req, res) => {
-//     try {
-//         const userID = req.user.userId
-//         // const userID = req.user._id;
-//         const { fullname, address, phone, note, type } = req.body;
 
-//         // 1. Lấy giỏ hàng
-//         const cart = await Cart.findOne({ userID }).populate('items.product');
-//         if (!cart || cart.items.length === 0) {
-//             return res.status(400).json({ message: 'Giỏ hàng trống!' });
-//         }
-
-//         // 2. Tính tổng
-//         let totalPrice = 0;
-//         for (const item of cart.items) {
-//             totalPrice += item.product.price * item.quantity;
-//         }
-
-//         // 3. Tạo đơn hàng
-//         const newOrder = new Order({
-//             userID,
-//             fullname,
-//             address,
-//             phone,
-//             totalPrice,
-//             note,
-//             type
-//         });
-
-//         const savedOrder = await newOrder.save();
-
-//         // 4. Xoá giỏ
-//         await Cart.findOneAndDelete({ userID });
-
-//         res.status(201).json({
-//             message: 'Đặt hàng thành công!',
-//             order: savedOrder
-//         });
-
-//     } catch (error) {
-//         console.error('Tạo đơn hàng lỗi:', error);
-//         res.status(500).json({ message: 'Lỗi server' });
-//     }
-// };
-
-// Cập nhật một đơn hàng
 
 exports.createOrderFromCart = async (req, res) => {
     try {
         const userID = req.user.userId;
-        const { fullname, address, phone, note, type,fcmToken} = req.body;
+        const { fullname, address, phone, note, type} = req.body;
 
         const cart = await Cart.findOne({ userID }).populate('items.product');
         if (!cart || cart.items.length === 0) {
@@ -127,19 +63,10 @@ exports.createOrderFromCart = async (req, res) => {
 
         const savedOrder = await newOrder.save();
         await Cart.findOneAndDelete({ userID });
-        if (fcmToken) {
-            const title = "Đặt hàng thành công!";
-            const body = `Tổng tiền: ${totalPrice.toLocaleString()} VNĐ. Cảm ơn bạn đã mua sắm!`;
-            await sendNotificationToUser(fcmToken, title, body);
-        } else {
-            console.warn("Không nhận được fcmToken từ client");
-        }
-
         res.status(201).json({
             message: 'Đặt hàng thành công!',
             order: savedOrder
         });
-
     } catch (error) {
         console.error('Tạo đơn hàng lỗi:', error);
         res.status(500).json({ message: 'Lỗi server' });
@@ -169,7 +96,7 @@ exports.deleteOrder = async (req, res) => {
 exports.checkout = async (req, res) => {
     try {
         const userId = req.user.userId;
-        const { fullname, address, phone, note, type, fcmToken } = req.body;
+        const { fullname, address, phone, note, type} = req.body;
 
         if (!fullname || !address || !phone || !type) {
             return res.status(400).json({ message: 'Vui lòng điền đầy đủ thông tin đặt hàng' });
@@ -199,20 +126,8 @@ exports.checkout = async (req, res) => {
             items: cart.items
         });
         await order.save();
-
-        // Xóa giỏ hàng
         cart.items = [];
         await cart.save();
-
-        // 🔔 Gửi thông báo nếu có fcmToken
-        if (fcmToken) {
-            const title = "Đặt hàng thành công!";
-            const body = `Tổng tiền: ${totalPrice.toLocaleString()} VNĐ. Cảm ơn bạn đã mua sắm!`;
-            await sendNotificationToUser(fcmToken, title, body);
-        } else {
-            console.warn("Không nhận được fcmToken từ client");
-        }
-
         res.status(201).json({ message: 'Đặt hàng thành công', order });
     } catch (error) {
         console.error("Lỗi checkout:", error);

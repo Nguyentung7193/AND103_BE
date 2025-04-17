@@ -37,7 +37,7 @@ const OrderSchema = new mongoose.Schema({
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Product'
           },
-          name: String, // lưu để tránh bị thay đổi sau này
+          name: String,
           price: Number,
           quantity: Number
         }
