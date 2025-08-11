@@ -24,11 +24,11 @@ app.use("/api/users", userRoutes);
 // Sử dụng auth routes
 app.use("/api/auth", authRoutes);
 // api cho product
-app.use("/api/products",authenticateToken, productRoutes);
+app.use("/api/products", productRoutes);
 // api cho order
 app.use("/api/orders", orderRoutes);
 // api cho cart
-app.use("/api/cart",authenticateToken, cartRoutes);
+app.use("/api/cart", cartRoutes);
 // api cho category
 app.use('/api/categories', categoryRouter);
 
