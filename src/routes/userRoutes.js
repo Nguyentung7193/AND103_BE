@@ -1,5 +1,7 @@
 const express = require("express");
+const mongoose = require('mongoose');
 const User = require("../models/User");
+const { updateUser } = require("../controllers/userController");
 
 const router = express.Router();
 
@@ -15,5 +17,6 @@ router.post("/", async (req, res) => {
   await newUser.save();
   res.json(newUser);
 });
+router.put("/:id", updateUser);
 
 module.exports = router;
